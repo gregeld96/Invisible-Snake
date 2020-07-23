@@ -1,10 +1,12 @@
 <template>
 <div class="home" style="background-color: whitesmoke;">
+{{ players }}
 <h1>{{message}}</h1>
 <div class="board">
 <block :data="block" class="block" v-for="(block, index) in board" :key="index"></block>
 </div>
 <button class="roll" @click="addStep" v-if="players[currentPlayer].playerName === playerName && !message">ROLL DICE</button>
+<button @click="restart" v-else-if="message">Restart</button>
 </div>
 </template>
 
@@ -35,6 +37,10 @@ export default {
       if (this.currentPlayer === this.players.length - 1) this.currentPlayer = 0
       else this.currentPlayer++
       socket.emit('changePlayer', this.currentPlayer)
+    },
+    restart () {
+      socket.emit('restart')
+      this.$router.push('/')
     }
   },
   created: function () {
@@ -52,6 +58,11 @@ export default {
 
     socket.on('player-win', (data) => {
       this.message = `WINNER IS ${data.playerName}`
+    })
+
+    socket.on('restart', (data) => {
+      this.players = data
+      localStorage.clear()
     })
   }
 }
