@@ -1,13 +1,15 @@
 <template>
 <div class="home" style="background-color: whitesmoke;">
+<h1>{{message}}</h1>
 <div class="board">
 <block :data="block" class="block" v-for="(block, index) in board" :key="index"></block>
 </div>
-<button class="roll">ROLL DICE</button>
+<button class="roll" @click="addStep" v-if="players[currentPlayer].playerName === playerName && !message">ROLL DICE</button>
 </div>
 </template>
 
 <script>
+import socket from '../config/socket'
 import block from '../components/block'
 export default {
   name: 'home',
@@ -17,18 +19,40 @@ export default {
   data () {
     return {
       dimension: 10,
-      board: null
+      board: null,
+      playerName: localStorage.playerName,
+      players: [],
+      currentPlayer: 0,
+      message: ''
     }
   },
   methods: {
     fetchBoard () {
       this.$store.dispatch('generateBoard', this.dimension)
+    },
+    addStep () {
+      socket.emit('add-step', this.currentPlayer)
+      if (this.currentPlayer === this.players.length - 1) this.currentPlayer = 0
+      else this.currentPlayer++
+      socket.emit('changePlayer', this.currentPlayer)
     }
   },
   created: function () {
     this.fetchBoard()
     this.board = this.$store.state.board
     this.$store.state.board = null
+
+    socket.on('player-data', (data) => {
+      this.players = data
+    })
+
+    socket.on('changePlayer', (index) => {
+      this.currentPlayer = index
+    })
+
+    socket.on('player-win', (data) => {
+      this.message = `WINNER IS ${data.playerName}`
+    })
   }
 }
 </script>
