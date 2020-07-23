@@ -1,5 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import socket from '../config/socket'
+import router from '../router'
 
 Vue.use(Vuex)
 
@@ -8,12 +10,16 @@ export default new Vuex.Store({
     board: null,
     row: [],
     col: [],
-    num: 1
+    num: 1,
+    currentPlayer: 0
   },
   mutations: {
     board (state, payload) {
       console.log(payload)
       state.board = payload
+    },
+    changePlayer (state, payload) {
+      state.currentPlayer = payload
     }
   },
   actions: {
@@ -32,6 +38,14 @@ export default new Vuex.Store({
         this.state.col = []
       } console.log(this.state.row)
       context.commit('board', [].concat.apply([], this.state.row))
+    },
+    changePlayer (context, payload) {
+      context.commit('changePlayer', payload)
+    },
+    userJoin (context, payload) {
+      socket.emit('user-join', payload)
+      localStorage.setItem('playerName', payload)
+      router.push({ name: 'snake-and-ladder' })
     }
   },
   getters: {
