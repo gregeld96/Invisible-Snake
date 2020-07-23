@@ -1,22 +1,23 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
+import Entrance from '../views/Entrance.vue'
 
 Vue.use(VueRouter)
 
 const routes = [
   {
-    path: '/',
+    path: '/home',
     name: 'Home',
     component: Home
   },
   {
-    path: '/about',
-    name: 'About',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
+    path: '/',
+    name: 'Entrance',
+    component: Entrance
+    // beforeEnter: (to, from, next) => {
+    //   if (localStorage.playerName) next({ name: 'Home' })
+    // }
   }
 ]
 
@@ -25,5 +26,10 @@ const router = new VueRouter({
   base: process.env.BASE_URL,
   routes
 })
+
+// router.beforeEach((to, from, next) => {
+//   if (to.name !== 'Entrance' && !localStorage.playerName) next({ name: 'Entrance' })
+//   else next()
+// })
 
 export default router
