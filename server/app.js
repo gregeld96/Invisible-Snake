@@ -37,6 +37,11 @@ io.on('connection', socket => {
     socket.on('changePlayer', (currentIndex) => {
         io.emit('changePlayer', currentIndex)
     })
+
+    socket.on('restart', () => {
+        players = []
+        io.emit('restart-game', players)
+    })
 });
 
 server.listen(PORT, () => {

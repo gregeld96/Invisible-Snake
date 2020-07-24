@@ -1,13 +1,16 @@
 <template>
 <div class="home" style="background-color: whitesmoke;">
+<!-- {{ players }} -->
+{{ playerName[0] }}
 <h1>{{message}}</h1>
 <div class="board">
 <block :data="block" class="block" v-for="(block, index) in board" :key="index"></block>
 </div>
-<button class="roll" @click="addStep" v-if="players[currentPlayer].playerName === playerName && !message">ROLL DICE</button>
+<button class="roll" @click="addStep" v-if="players[currentPlayer].playerName === playerName && !message" >ROLL DICE</button>
+<button @click="restart" v-else-if="message">Restart</button>
 </div>
-</template>
 
+</template>
 <script>
 import socket from '../config/socket'
 import block from '../components/block'
@@ -35,13 +38,16 @@ export default {
       if (this.currentPlayer === this.players.length - 1) this.currentPlayer = 0
       else this.currentPlayer++
       socket.emit('changePlayer', this.currentPlayer)
+    },
+    restart () {
+      socket.emit('restart')
+      this.$router.push('/')
     }
   },
   created: function () {
+    this.board = null
     this.fetchBoard()
     this.board = this.$store.state.board
-    this.$store.state.board = null
-
     socket.on('player-data', (data) => {
       this.players = data
     })
@@ -52,6 +58,12 @@ export default {
 
     socket.on('player-win', (data) => {
       this.message = `WINNER IS ${data.playerName}`
+    })
+
+    socket.on('restart', (data) => {
+      this.$store.state.board = null
+      this.players = data
+      localStorage.clear()
     })
   }
 }
@@ -93,6 +105,7 @@ export default {
     margin-bottom: 20px;
     display: flex;
     flex-wrap: wrap;
+    overflow: hidden;
 }
 
 .block{

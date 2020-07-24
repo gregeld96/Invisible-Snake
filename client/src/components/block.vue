@@ -1,6 +1,7 @@
 <template>
 <div class="block-component">
-    <p>{{data}}</p>
+    <p v-if="playerPosition">{{ playerPosition }}</p>
+    <p v-else>{{ data }}</p>
 </div>
 </template>
 
@@ -13,8 +14,7 @@ export default {
 
     }
   },
-  methods: {
-
+  computed: {
   }
 }
 </script>
