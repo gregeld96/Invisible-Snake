@@ -14,17 +14,22 @@
     <td><img :src="`https://avatars.dicebear.com/api/human/${player.playerName}.svg`" /></td>
     <td v-if="player.playerIndex === 0" :rowspan="players.length">{{ players[currentPlayer].playerName }}</td>
   </tr>
-</table>
-</div>
-<div class="home" style="background-color: whitesmoke;">
-<!-- {{ players }} -->
-<h1>{{message}}</h1>
-<div class="board">
-<block :data="block" class="block" v-for="(block, index) in board" :key="index" :players='players'></block>
-</div>
-<button class="roll" @click="addStep" v-if="players[currentPlayer].playerName === playerName && !message" >ROLL DICE</button>
-<button class='button' @click="restart" v-else-if="message">Restart</button>
-</div>
+  </table>
+  <div id="dice">
+    <p id="placeholder">
+      {{dice}}
+    </p>
+    <button class="roll" @click="addStep" v-if="players[currentPlayer].playerName === playerName && !message" >ROLL DICE</button>
+    <button class='button' @click="restart" v-else-if="message">Restart</button>
+  </div>
+  </div>
+  <div class="home" style="background-color: whitesmoke;">
+  <!-- {{ players }} -->
+  <h1>{{message}}</h1>
+  <div class="board">
+  <block :data="block" class="block" v-for="(block, index) in board" :key="index" :players='players'></block>
+  </div>
+  </div>
 </div>
 </template>
 <script>
@@ -43,7 +48,8 @@ export default {
       playerName: localStorage.playerName,
       players: [],
       currentPlayer: 0,
-      message: ''
+      message: '',
+      dice: null
     }
   },
   methods: {
@@ -93,6 +99,10 @@ export default {
       this.players = data
       localStorage.clear()
       this.$router.push('/')
+    })
+
+    socket.on('roll-dice', (step) => {
+      this.dice = step
     })
 
     socket.on('ladder', (data) => {
@@ -187,5 +197,15 @@ table {
   height: 50px;
   background-color: teal;
   color: white;
+}
+
+#placeholder {
+  height: 100px;
+  width: 100px;
+  padding: 50px;
+  margin: 50px auto;
+  border: 1px solid gray;
+  border-radius: 10px;
+  font-size:80px;
 }
 </style>
