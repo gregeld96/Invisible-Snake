@@ -15,9 +15,6 @@ const routes = [
     path: '/',
     name: 'Entrance',
     component: Entrance
-    // beforeEnter: (to, from, next) => {
-    //   if (localStorage.playerName) next({ name: 'Home' })
-    // }
   }
 ]
 
@@ -27,9 +24,9 @@ const router = new VueRouter({
   routes
 })
 
-// router.beforeEach((to, from, next) => {
-//   if (to.name !== 'Entrance' && !localStorage.playerName) next({ name: 'Entrance' })
-//   else next()
-// })
+router.beforeEach((to, from, next) => {
+  if (to.name !== 'Entrance' && !localStorage.playerName) next({ name: 'Entrance' })
+  else next()
+})
 
 export default router

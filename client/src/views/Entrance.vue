@@ -18,6 +18,7 @@
 </template>
 
 <script>
+import socket from '../config/socket'
 export default {
   name: 'Entrance',
   data () {
@@ -32,6 +33,8 @@ export default {
     }
   },
   created () {
+    localStorage.clear()
+    socket.emit('restart')
   }
 }
 </script>

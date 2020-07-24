@@ -1,19 +1,36 @@
 <template>
+<div class="row">
+  <div>
+  <table>
+  <tr>
+    <th>No.</th>
+    <th>Player Name</th>
+    <th>Icon</th>
+    <th>Player Turn</th>
+  </tr>
+  <tr v-for="player in players" :key="player.playerIndex">
+    <td>{{ player.playerIndex+1}}</td>
+    <td>{{ player.playerName}}</td>
+    <td><img :src="`https://avatars.dicebear.com/api/human/${player.playerName}.svg`" /></td>
+    <td v-if="player.playerIndex === 0" :rowspan="players.length">{{ players[currentPlayer].playerName }}</td>
+  </tr>
+</table>
+</div>
 <div class="home" style="background-color: whitesmoke;">
 <!-- {{ players }} -->
-{{ playerName[0] }}
 <h1>{{message}}</h1>
 <div class="board">
-<block :data="block" class="block" v-for="(block, index) in board" :key="index"></block>
+<block :data="block" class="block" v-for="(block, index) in board" :key="index" :players='players'></block>
 </div>
 <button class="roll" @click="addStep" v-if="players[currentPlayer].playerName === playerName && !message" >ROLL DICE</button>
-<button @click="restart" v-else-if="message">Restart</button>
+<button class='button' @click="restart" v-else-if="message">Restart</button>
 </div>
-
+</div>
 </template>
 <script>
 import socket from '../config/socket'
 import block from '../components/block'
+import Swal from 'sweetalert2'
 export default {
   name: 'home',
   components: {
@@ -41,10 +58,10 @@ export default {
     },
     restart () {
       socket.emit('restart')
-      this.$router.push('/')
     }
   },
   created: function () {
+    // socket.emit('restart')
     this.board = null
     this.fetchBoard()
     this.board = this.$store.state.board
@@ -57,13 +74,55 @@ export default {
     })
 
     socket.on('player-win', (data) => {
-      this.message = `WINNER IS ${data.playerName}`
+      this.message = `Winner Is ${data.playerName}`
+      Swal.fire({
+        title: `${data.playerName} is The Winner`,
+        width: 600,
+        padding: '3em',
+        background: '#fff url("https://acegif.com/wp-content/uploads/2020/05/confetti.gif")',
+        backdrop: `
+          rgba(0,0,123,0.4)
+          url("https://33.media.tumblr.com/e81cbd3ba2b119177e98d05878b7e96c/tumblr_nji005weBd1qiq6rto1_250.gif")
+          right top
+          no-repeat
+        `
+      })
     })
 
-    socket.on('restart', (data) => {
-      this.$store.state.board = null
+    socket.on('restart-game', (data) => {
       this.players = data
       localStorage.clear()
+      this.$router.push('/')
+    })
+
+    socket.on('ladder', (data) => {
+      Swal.fire({
+        title: `${this.players[data].playerName} Got a Ladder`,
+        width: 600,
+        padding: '3em',
+        background: '#fff url(/images/trees.png)',
+        backdrop: `
+          rgba(0,0,123,0.4)
+          url("https://thumbs.gfycat.com/ScaryMassiveGallowaycow-small.gif")
+          left top
+          no-repeat
+        `
+      })
+    })
+
+    socket.on('snake', (data) => {
+      Swal.fire({
+        title: `${this.players[data].playerName} Got a Snake`,
+        width: 600,
+        padding: '3em',
+        background: '#fff url(/images/trees.png)',
+        backdrop: `
+          rgba(0,0,123,0.4)
+          url("https://thumbs.gfycat.com/HeavenlyWanHornedviper-max-1mb.gif")
+          left top
+          no-repeat
+        `
+      })
     })
   }
 }
@@ -74,8 +133,16 @@ export default {
     height: 600px;
     width: 600px;
     border: 2px solid;
-    margin-left: 310px;
-    margin-top: 30px;
+    /* margin: auto; */
+}
+
+.row {
+  display: flex;
+  justify-content: center;
+}
+
+table {
+  width: 500px;
 }
 
 .roll{
@@ -112,5 +179,13 @@ export default {
     width: 10%;
     height: 10%;
     font-size: 14px;
+}
+
+.button{
+  margin-top: 20px;
+  width: 100px;
+  height: 50px;
+  background-color: teal;
+  color: white;
 }
 </style>
