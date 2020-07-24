@@ -12,7 +12,6 @@ let players = [] // create socket for adding the players
 io.on('connection', socket => {
     console.log('User Connected')
     socket.on('user-join', (playerName) => {
-        // console.log(players.length)
         const player = {
             playerName,
             position: 0,
@@ -20,15 +19,23 @@ io.on('connection', socket => {
         }
         players.push(player)
         io.emit('player-data', players)
-        // console.log(nickname)
     })
 
     socket.on('add-step', (currentIndex) => {
         const steps = gameCompute.rollDice()
         players[currentIndex].position += steps
-        if (players[currentIndex].position >= 10) {
-            players[currentIndex].position = 10
+        if (players[currentIndex].position >= 100) {
+            players[currentIndex].position = 100
             io.emit('player-win', players[currentIndex])
+            io.emit('player-data', players)
+        } else if (players[currentIndex].position === 5 || players[currentIndex].position === 25 || players[currentIndex].position === 2) {
+            players[currentIndex].position = 39
+            io.emit('player-data', players)
+            io.emit('ladder', currentIndex)
+        } else if (players[currentIndex].position === 3 || players[currentIndex].position === 20 || players[currentIndex].position === 6 || players[currentIndex].position === 50) {
+            players[currentIndex].position = 1
+            io.emit('player-data', players)
+            io.emit('snake', currentIndex)
         } else {
             io.emit('player-data', players)
         }
