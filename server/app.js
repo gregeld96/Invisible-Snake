@@ -25,9 +25,13 @@ io.on('connection', socket => {
         const steps = gameCompute.rollDice()
         players[currentIndex].position += steps
         if (players[currentIndex].position >= 100) {
-            players[currentIndex].position = 100
-            io.emit('player-win', players[currentIndex])
-            io.emit('player-data', players)
+            if (players[currentIndex].position === 100) {
+                io.emit('player-win', players[currentIndex])
+                io.emit('player-data', players)
+            } else {
+                players[currentIndex].position = 100 - (players[currentIndex].position - 100)
+                io.emit('player-data', players)
+            }
         } else if (players[currentIndex].position === 5 || players[currentIndex].position === 25 || players[currentIndex].position === 2) {
             players[currentIndex].position = 39
             io.emit('player-data', players)
