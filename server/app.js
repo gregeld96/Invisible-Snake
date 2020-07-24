@@ -24,6 +24,7 @@ io.on('connection', socket => {
     socket.on('add-step', (currentIndex) => {
         const steps = gameCompute.rollDice()
         players[currentIndex].position += steps
+        io.emit('roll-dice', steps)
         if (players[currentIndex].position >= 100) {
             if (players[currentIndex].position === 100) {
                 io.emit('player-win', players[currentIndex])
